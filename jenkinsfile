@@ -4,16 +4,27 @@ pipeline {
         LABS = credentials('labcreds')
     }
     stages {
+        stage('Setup') {
+            steps {
+                sh '''
+                    python3 -m venv /bitnami/jenkins/home/.local/venv
+                    source /bitnami/jenkins/home/.local/venv/bin/activate
+                    pip install pipenv
+                '''
+            }
+        }
         stage('Build') {
             steps {
-                sh 'pip3 install --user pipenv'
-                sh '/bitnami/jenkins/home/.local/bin/pipenv --rm || exit 0'
-                sh '/bitnami/jenkins/home/.local/bin/pipenv install'
+                sh '''
+                    /bitnami/jenkins/home/.local/venv/bin/pipenv install
+                '''
             }
         }
         stage('Test') {
             steps {
-                sh '/bitnami/jenkins/home/.local/bin/pipenv run pytest'
+                sh '''
+                    /bitnami/jenkins/home/.local/venv/bin/pipenv run pytest
+                '''
             }
         }
         stage('Package') {
