@@ -7,23 +7,22 @@ pipeline {
         stage('Setup') {
             steps {
                 sh '''
-                    python3 -m venv /bitnami/jenkins/home/.local/venv
-                    source /bitnami/jenkins/home/.local/venv/bin/activate
-                    pip install pipenv
+                    python3 -m venv .venv
+                    source .venv/bin/activate
                 '''
             }
         }
         stage('Build') {
             steps {
                 sh '''
-                    /bitnami/jenkins/home/.local/venv/bin/pipenv install
+                    pip install pipenv
                 '''
             }
         }
         stage('Test') {
             steps {
                 sh '''
-                    /bitnami/jenkins/home/.local/venv/bin/pipenv run pytest
+                    pipenv run pytest
                 '''
             }
         }
