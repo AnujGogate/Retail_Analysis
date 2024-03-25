@@ -4,16 +4,26 @@ pipeline {
         LABS = credentials('labcreds')
     }
     stages {
+        stage('Setup') {
+            steps {
+                sh '''
+                    python3 -m venv .venv
+                    .venv/bin/activate
+                '''
+            }
+        }
         stage('Build') {
             steps {
-                sh 'pip3 install --user pipenv'
-                sh '/bitnami/jenkins/home/.local/bin/pipenv --rm || exit 0'
-                sh '/bitnami/jenkins/home/.local/bin/pipenv install'
+                sh '''
+                    pip install pipenv
+                '''
             }
         }
         stage('Test') {
             steps {
-                sh '/bitnami/jenkins/home/.local/bin/pipenv run pytest'
+                sh '''
+                    pipenv run pytest
+                '''
             }
         }
         stage('Package') {
@@ -23,7 +33,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'sshpass -p $LABS_PSW scp -o StrictHostKeyChecking=no -r $LABS_USR@g02.itversity.com:/home/itv005913/retailproject'
+                sh 'sshpass -p $LABS_PSW scp -o StrictHostKeyChecking=no -r . $LABS_USR@g02.itversity.com:/home/itv005913/retailproject'
             }
         }
     }
